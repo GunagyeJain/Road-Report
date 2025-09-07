@@ -143,10 +143,11 @@ const IssueReportForm: React.FC = () => {
       );
 
       console.log("✅ Issue submitted with ID:", issueId);
+      // In the handleSubmit function, find this section:
       setSuccess(true);
 
       setTimeout(() => {
-        navigate("/dashboard");
+        navigate("/dashboard"); // Always go to dashboard after successful report
       }, 2000);
     } catch (error: any) {
       console.error("❌ Submit error:", error);
