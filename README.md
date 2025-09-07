@@ -24,7 +24,7 @@ CivicReport bridges the gap between citizens and local government by providing a
 
 ### Demo Accounts
 - **Regular User**: Create any account to report issues
-- **Admin Access**: `judge@civicreport.demo` / `hackathon2024`
+- **Admin Access**: `judge@roadreport.demo` / `hackodisha`
 
 ## 🛠️ Tech Stack
 
