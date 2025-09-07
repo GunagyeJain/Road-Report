@@ -1,6 +1,6 @@
 import React, { createContext, useContext, useEffect, useState } from 'react';
-import type { User, Session } from '@supabase/supabase-js';
 import { AuthError } from '@supabase/supabase-js';
+import type { User, Session } from '@supabase/supabase-js';
 import { supabase } from '../services/supabase';
 
 interface AuthContextType {
@@ -67,6 +67,58 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     return { error: { message: 'Anonymous login not implemented yet' } as AuthError };
   };
 
+  // Check admin status from database
+  const checkAdminStatus = async (user: User) => {
+    if (!supabase) {
+      console.log('❌ Supabase not initialized');
+      setIsAdmin(false);
+      return;
+    }
+
+    try {
+      console.log('🔍 Checking admin status for user:', user.email);
+      
+      const { data, error } = await supabase
+        .from('profiles')
+        .select('is_admin')
+        .eq('id', user.id)
+        .single();
+
+      if (error) {
+        console.error('❌ Error checking admin status:', error);
+        
+        // Try checking by email as fallback
+        const { data: emailData, error: emailError } = await supabase
+          .from('profiles')
+          .select('is_admin')
+          .eq('email', user.email)
+          .single();
+
+        if (emailError) {
+          console.error('❌ Error checking admin status by email:', emailError);
+          setIsAdmin(false);
+        } else if (emailData) {
+          const adminStatus = emailData.is_admin || false;
+          console.log('✅ Admin status found by email for', user.email, ':', adminStatus);
+          setIsAdmin(adminStatus);
+        } else {
+          console.log('⚠️ No profile found for user:', user.email);
+          setIsAdmin(false);
+        }
+      } else if (data) {
+        const adminStatus = data.is_admin || false;
+        console.log('✅ Admin status for', user.email, ':', adminStatus);
+        setIsAdmin(adminStatus);
+      } else {
+        console.log('⚠️ No profile data found for user:', user.email);
+        setIsAdmin(false);
+      }
+    } catch (error) {
+      console.error('❌ Error in checkAdminStatus:', error);
+      setIsAdmin(false);
+    }
+  };
+
   useEffect(() => {
     if (!supabase) {
       console.warn('⚠️ Supabase not initialized - running in mock mode');
@@ -79,9 +131,8 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
       setSession(session);
       setCurrentUser(session?.user ?? null);
       
-      // TEMPORARY: Set admin based on email (for testing)
-      if (session?.user?.email === 'gunagye.jain@gmail.com') {
-        setIsAdmin(true);
+      if (session?.user) {
+        checkAdminStatus(session.user);
       } else {
         setIsAdmin(false);
       }
@@ -96,9 +147,8 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
       setSession(session);
       setCurrentUser(session?.user ?? null);
       
-      // TEMPORARY: Set admin based on email (for testing)
-      if (session?.user?.email === 'gunagye.jain@gmail.com') {
-        setIsAdmin(true);
+      if (session?.user) {
+        await checkAdminStatus(session.user);
       } else {
         setIsAdmin(false);
       }
