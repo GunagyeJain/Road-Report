@@ -5,9 +5,9 @@ import DashboardLayout from "../components/dashboard/DashboardLayout";
 import StatsCards from "../components/dashboard/StatsCards";
 import IssuesMap from "../components/map/IssuesMap";
 import IssueList from "../components/dashboard/IssueList";
-import { Map, List, Filter } from "lucide-react";
+import { Map, List, Filter, Eye } from "lucide-react";
 import type { IssueStatus } from "../types";
-import { Link } from 'react-router-dom'
+import { Link } from "react-router-dom";
 
 const SimpleDashboard: React.FC = () => {
   const { currentUser } = useAuth();
@@ -24,13 +24,15 @@ const SimpleDashboard: React.FC = () => {
     categoryFilter,
     setCategoryFilter,
     loadIssues,
+    // Remove: isConnected, lastUpdate
   } = useDashboard(currentUser?.id, false);
 
   if (loading) {
     return (
       <DashboardLayout
-        title="My Dashboard"
-        subtitle={`Welcome back, ${currentUser?.email}`}
+        title="Community Dashboard"
+        subtitle={`Transparent view of all civic issues • ${issues.length} total community reports`}
+        // Remove: isConnected={isConnected}, lastUpdate={lastUpdate}
       >
         <div style={{ textAlign: "center", padding: "3rem" }}>
           <span
@@ -38,7 +40,7 @@ const SimpleDashboard: React.FC = () => {
             style={{ width: "40px", height: "40px" }}
           ></span>
           <p style={{ marginTop: "1rem", color: "#64748b" }}>
-            Loading your issues...
+            Loading community issues...
           </p>
         </div>
       </DashboardLayout>
@@ -47,12 +49,57 @@ const SimpleDashboard: React.FC = () => {
 
   return (
     <DashboardLayout
-      title="My Dashboard"
-      subtitle={`Track your reported issues • ${issues.length} total reports`}
+      title="Community Dashboard"
+      subtitle={`Transparent view of all civic issues • ${issues.length} total community reports`}
     >
+      
       {/* Stats Cards */}
       <StatsCards issues={issues} />
-      {/* Welcome Message for New Users */}
+
+      {/* Public Notice */}
+      <div
+        style={{
+          background: "linear-gradient(135deg, #e0f2fe 0%, #f0f9ff 100%)",
+          border: "1px solid #bae6fd",
+          borderRadius: "12px",
+          padding: "1rem",
+          marginBottom: "2rem",
+          display: "flex",
+          alignItems: "center",
+          gap: "1rem",
+        }}
+      >
+        <div
+          style={{
+            background: "#0ea5e9",
+            borderRadius: "50%",
+            width: "40px",
+            height: "40px",
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "center",
+          }}
+        >
+          <Eye size={20} color="white" />
+        </div>
+        <div>
+          <h4
+            style={{
+              margin: "0 0 0.25rem",
+              color: "#0c4a6e",
+              fontSize: "1rem",
+            }}
+          >
+            🌍 Public Transparency View
+          </h4>
+          <p style={{ margin: 0, color: "#0369a1", fontSize: "0.875rem" }}>
+            You're viewing all civic issues reported by community members. This
+            promotes transparency and collective problem-solving!
+          </p>
+        </div>
+      </div>
+
+      {/* Welcome Message for Community */}
       {issues.length === 0 && (
         <div
           style={{
@@ -66,7 +113,7 @@ const SimpleDashboard: React.FC = () => {
         >
           <div style={{ fontSize: "3rem", marginBottom: "1rem" }}>🏘️</div>
           <h3 style={{ margin: "0 0 1rem", color: "#1e293b" }}>
-            Welcome to CivicReport!
+            Welcome to Community CivicReport!
           </h3>
           <p
             style={{
@@ -76,8 +123,9 @@ const SimpleDashboard: React.FC = () => {
               margin: "0 auto 1.5rem",
             }}
           >
-            You haven't reported any issues yet. Start making a difference in
-            your community by reporting civic problems that need attention.
+            This is a transparent platform where everyone can see civic issues
+            in the community. Start contributing by reporting problems that need
+            attention.
           </p>
           <Link
             to="/report"
@@ -87,7 +135,7 @@ const SimpleDashboard: React.FC = () => {
               padding: "0.75rem 2rem",
             }}
           >
-            🚀 Report Your First Issue
+            🚀 Report an Issue
           </Link>
         </div>
       )}
@@ -191,6 +239,7 @@ const SimpleDashboard: React.FC = () => {
           </select>
         </div>
       </div>
+
       {/* Error State */}
       {error && (
         <div
@@ -210,6 +259,7 @@ const SimpleDashboard: React.FC = () => {
           </button>
         </div>
       )}
+
       {/* Content */}
       {!error && (
         <div
@@ -221,7 +271,7 @@ const SimpleDashboard: React.FC = () => {
           }}
         >
           <h3 style={{ marginTop: 0, marginBottom: "1rem", color: "#1e293b" }}>
-            Your Issues {view === "map" ? "Map" : "List"} (
+            Community Issues {view === "map" ? "Map" : "List"} (
             {filteredIssues.length}{" "}
             {filteredIssues.length === 1 ? "issue" : "issues"})
           </h3>
@@ -233,7 +283,7 @@ const SimpleDashboard: React.FC = () => {
               <h4>No issues found</h4>
               <p>
                 {issues.length === 0
-                  ? "You haven't reported any issues yet. Start making a difference in your community!"
+                  ? "No civic issues have been reported yet. Be the first to contribute to community improvement!"
                   : "No issues match your current filters. Try adjusting the filters above."}
               </p>
               {issues.length === 0 && (
@@ -242,7 +292,7 @@ const SimpleDashboard: React.FC = () => {
                   className="btn btn-primary"
                   style={{ marginTop: "1rem" }}
                 >
-                  Report Your First Issue
+                  Report First Community Issue
                 </a>
               )}
             </div>
@@ -255,14 +305,14 @@ const SimpleDashboard: React.FC = () => {
                     style={{
                       marginBottom: "1rem",
                       padding: "0.75rem",
-                      background: "#f0f9ff",
+                      background: "#f0fdf4",
                       borderRadius: "8px",
                       fontSize: "0.875rem",
-                      color: "#0369a1",
+                      color: "#166534",
                     }}
                   >
-                    💡 <strong>Tip:</strong> Click on any marker to see issue
-                    details. Different colors represent different statuses:
+                    🌍 <strong>Community Map:</strong> All civic issues are
+                    visible for transparency. Click markers to see details.
                     <span style={{ color: "#dc2626", fontWeight: "bold" }}>
                       {" "}
                       Red = Pending
@@ -282,7 +332,7 @@ const SimpleDashboard: React.FC = () => {
                 </div>
               )}
 
-              {/* List View */}
+              {/* List View - No admin controls for regular users */}
               {view === "list" && (
                 <IssueList issues={filteredIssues} isAdminView={false} />
               )}

@@ -14,13 +14,10 @@ export const useDashboard = (userId?: string, isAdminView: boolean = false) => {
   const [categoryFilter, setCategoryFilter] = useState<string>('all');
 
   const loadIssues = async () => {
-    if (!userId && !isAdminView) return;
-    
     try {
       setLoading(true);
-      const fetchedIssues = isAdminView 
-        ? await IssueService.getAllIssues()
-        : await IssueService.getIssuesByUser(userId!);
+      // Always load all issues for public transparency
+      const fetchedIssues = await IssueService.getAllIssues();
       
       setIssues(fetchedIssues);
       setError('');
@@ -49,6 +46,7 @@ export const useDashboard = (userId?: string, isAdminView: boolean = false) => {
     try {
       await IssueService.updateIssueStatus(issueId, newStatus);
       
+      // Manual state update
       setIssues(prevIssues => 
         prevIssues.map(issue => 
           issue.id === issueId 
@@ -56,6 +54,7 @@ export const useDashboard = (userId?: string, isAdminView: boolean = false) => {
             : issue
         )
       );
+      
     } catch (error: any) {
       throw error;
     }
@@ -81,6 +80,9 @@ export const useDashboard = (userId?: string, isAdminView: boolean = false) => {
     categoryFilter,
     setCategoryFilter,
     loadIssues,
-    updateIssueStatus
+    updateIssueStatus,
+    // Add these missing return values
+    isConnected: true, // Mock value for now
+    lastUpdate: null as Date | null // Mock value for now
   };
 };

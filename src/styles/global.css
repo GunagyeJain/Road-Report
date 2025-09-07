@@ -38,6 +38,11 @@ html, body {
   text-decoration: none;
   display: inline-block;
   text-align: center;
+
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 3px;
 }
 
 .btn-primary {

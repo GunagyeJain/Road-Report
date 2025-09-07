@@ -1,20 +1,24 @@
 import React from 'react';
 import { useAuth } from '../../context/AuthContext';
 import { Link } from 'react-router-dom';
-import { User, LogOut, Shield, Plus } from 'lucide-react';
+import { User, LogOut, Shield, Plus, Wifi, WifiOff } from 'lucide-react';
 
 interface DashboardLayoutProps {
   children: React.ReactNode;
   title: string;
   subtitle: string;
   isAdminView?: boolean;
+  isConnected?: boolean;
+  lastUpdate?: Date | null;
 }
 
 const DashboardLayout: React.FC<DashboardLayoutProps> = ({ 
   children, 
   title, 
   subtitle, 
-  isAdminView = false 
+  isAdminView = false,
+  isConnected = false,
+  lastUpdate
 }) => {
   const { currentUser, isAdmin, logout } = useAuth();
 
@@ -53,11 +57,35 @@ const DashboardLayout: React.FC<DashboardLayoutProps> = ({
               {isAdminView ? <Shield size={24} color="white" /> : <User size={24} color="white" />}
             </div>
             <div>
-              <h1 style={{ margin: 0, fontSize: '1.5rem', fontWeight: '700', color: '#1e293b' }}>
-                {title}
-              </h1>
+              <div style={{ display: 'flex', alignItems: 'center', gap: '1rem' }}>
+                <h1 style={{ margin: 0, fontSize: '1.5rem', fontWeight: '700', color: '#1e293b' }}>
+                  {title}
+                </h1>
+                
+                {/* Real-time status indicator */}
+                <div style={{ 
+                  display: 'flex', 
+                  alignItems: 'center', 
+                  gap: '0.5rem',
+                  background: isConnected ? '#dcfce7' : '#fef2f2',
+                  color: isConnected ? '#166534' : '#dc2626',
+                  padding: '0.25rem 0.75rem',
+                  borderRadius: '12px',
+                  fontSize: '0.75rem',
+                  fontWeight: '500'
+                }}>
+                  {isConnected ? <Wifi size={14} /> : <WifiOff size={14} />}
+                  {isConnected ? 'Live Updates' : 'Offline'}
+                </div>
+              </div>
+              
               <p style={{ margin: 0, color: '#64748b', fontSize: '0.875rem' }}>
                 {subtitle}
+                {lastUpdate && (
+                  <span style={{ marginLeft: '0.5rem', color: '#10b981' }}>
+                    • Last update: {lastUpdate.toLocaleTimeString()}
+                  </span>
+                )}
               </p>
             </div>
           </div>
@@ -69,12 +97,12 @@ const DashboardLayout: React.FC<DashboardLayoutProps> = ({
                 {isAdminView ? (
                   <Link to="/dashboard" className="btn" style={{ background: '#4facfe', color: 'white' }}>
                     <User size={20} />
-                    My Issues
+                    Community View
                   </Link>
                 ) : (
                   <Link to="/admin" className="btn" style={{ background: '#8b5cf6', color: 'white' }}>
                     <Shield size={20} />
-                    Admin View
+                    Admin Control
                   </Link>
                 )}
               </>
