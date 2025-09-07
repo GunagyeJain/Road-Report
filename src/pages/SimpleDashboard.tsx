@@ -113,7 +113,7 @@ const SimpleDashboard: React.FC = () => {
         >
           <div style={{ fontSize: "3rem", marginBottom: "1rem" }}>🏘️</div>
           <h3 style={{ margin: "0 0 1rem", color: "#1e293b" }}>
-            Welcome to Community CivicReport!
+            Welcome to Community RoadReport!
           </h3>
           <p
             style={{

@@ -47,7 +47,7 @@ const Login: React.FC = () => {
   return (
     <div className={styles.authContainer}>
       <div className={styles.authCard}>
-        <h2 className={styles.authTitle}>Welcome to CivicReport</h2>
+        <h2 className={styles.authTitle}>Welcome to Road Report</h2>
         <p className={styles.subtitle}>
           Sign in to report issues and track their progress
         </p>
