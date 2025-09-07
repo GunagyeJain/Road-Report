@@ -2,6 +2,7 @@ import React from 'react';
 import { useAuth } from '../../context/AuthContext';
 import { Link } from 'react-router-dom';
 import { User, LogOut, Shield, Plus, Wifi, WifiOff } from 'lucide-react';
+import { Analytics } from '@vercel/analytics/react';
 
 interface DashboardLayoutProps {
   children: React.ReactNode;
@@ -125,6 +126,7 @@ const DashboardLayout: React.FC<DashboardLayoutProps> = ({
       <div style={{ maxWidth: '1400px', margin: '2rem auto', padding: '0 1rem' }}>
         {children}
       </div>
+      <Analytics />
     </div>
   );
 };
