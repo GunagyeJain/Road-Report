@@ -6,6 +6,7 @@ import Login from './components/auth/Login';
 import Register from './components/auth/Register';
 import ReportIssuePage from './pages/ReportIssuePage';
 import SimpleDashboard from './pages/SimpleDashboard';
+import AdminDashboard from './pages/AdminDashboard';
 
 function App() {
   return (
@@ -28,6 +29,14 @@ function App() {
               element={
                 <ProtectedRoute requireAuth={true}>
                   <SimpleDashboard />
+                </ProtectedRoute>
+              } 
+            />
+            <Route 
+              path="/admin" 
+              element={
+                <ProtectedRoute requireAuth={true}>
+                  <AdminDashboard />
                 </ProtectedRoute>
               } 
             />

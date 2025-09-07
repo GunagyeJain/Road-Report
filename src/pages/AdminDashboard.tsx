@@ -1,5 +1,6 @@
 import React from 'react';
 import { useAuth } from '../context/AuthContext';
+import { useNavigate } from 'react-router-dom';
 import { useDashboard } from '../hooks/useDashboard';
 import DashboardLayout from '../components/dashboard/DashboardLayout';
 import StatsCards from '../components/dashboard/StatsCards';
@@ -8,8 +9,9 @@ import IssueList from '../components/dashboard/IssueList';
 import { Map, List, Filter } from 'lucide-react';
 import type { IssueStatus } from '../types';
 
-const SimpleDashboard: React.FC = () => {
-  const { currentUser } = useAuth();
+const AdminDashboard: React.FC = () => {
+  const { currentUser, isAdmin } = useAuth();
+  const navigate = useNavigate();
   
   const {
     issues,
@@ -22,18 +24,39 @@ const SimpleDashboard: React.FC = () => {
     setStatusFilter,
     categoryFilter,
     setCategoryFilter,
-    loadIssues
-  } = useDashboard(currentUser?.id, false);
+    loadIssues,
+    updateIssueStatus
+  } = useDashboard(undefined, true);
+
+  // Redirect non-admin users
+  React.useEffect(() => {
+    if (!currentUser || !isAdmin) {
+      navigate('/dashboard');
+    }
+  }, [currentUser, isAdmin, navigate]);
+
+  const handleStatusUpdate = async (issueId: string, newStatus: IssueStatus) => {
+    try {
+      await updateIssueStatus(issueId, newStatus);
+    } catch (error: any) {
+      alert('Failed to update issue status: ' + error.message);
+    }
+  };
+
+  if (!currentUser || !isAdmin) {
+    return null; // Will redirect
+  }
 
   if (loading) {
     return (
       <DashboardLayout 
-        title="My Dashboard" 
-        subtitle={`Welcome back, ${currentUser?.email}`}
+        title="Admin Dashboard" 
+        subtitle="Manage civic issues across the platform"
+        isAdminView={true}
       >
         <div style={{ textAlign: 'center', padding: '3rem' }}>
           <span className="spinner" style={{ width: '40px', height: '40px' }}></span>
-          <p style={{ marginTop: '1rem', color: '#64748b' }}>Loading your issues...</p>
+          <p style={{ marginTop: '1rem', color: '#64748b' }}>Loading all issues...</p>
         </div>
       </DashboardLayout>
     );
@@ -41,8 +64,9 @@ const SimpleDashboard: React.FC = () => {
 
   return (
     <DashboardLayout 
-      title="My Dashboard" 
-      subtitle={`Track your reported issues • ${issues.length} total reports`}
+      title="Admin Dashboard" 
+      subtitle={`System Overview • ${issues.length} total issues across all users`}
+      isAdminView={true}
     >
       {/* Stats Cards */}
       <StatsCards issues={issues} />
@@ -157,32 +181,70 @@ const SimpleDashboard: React.FC = () => {
       {/* Content */}
       {!error && (
         <div style={{ background: 'white', borderRadius: '12px', padding: '1rem', boxShadow: '0 1px 3px rgba(0,0,0,0.1)' }}>
-          <h3 style={{ marginTop: 0, marginBottom: '1rem', color: '#1e293b' }}>
-            Your Issues {view === 'map' ? 'Map' : 'List'} ({filteredIssues.length} {filteredIssues.length === 1 ? 'issue' : 'issues'})
-          </h3>
+          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '1rem' }}>
+            <h3 style={{ margin: 0, color: '#1e293b' }}>
+              All Issues {view === 'map' ? 'Map' : 'List'} ({filteredIssues.length} {filteredIssues.length === 1 ? 'issue' : 'issues'})
+            </h3>
+            
+            {/* Quick Action Buttons */}
+            <div style={{ display: 'flex', gap: '0.5rem', fontSize: '0.75rem' }}>
+              <button
+                onClick={() => setStatusFilter('pending')}
+                style={{
+                  background: statusFilter === 'pending' ? '#f59e0b' : '#fef3c7',
+                  color: statusFilter === 'pending' ? 'white' : '#92400e',
+                  border: 'none',
+                  padding: '0.25rem 0.5rem',
+                  borderRadius: '12px',
+                  cursor: 'pointer',
+                  fontWeight: '500'
+                }}
+              >
+                Show Pending
+              </button>
+              <button
+                onClick={() => setStatusFilter('in-progress')}
+                style={{
+                  background: statusFilter === 'in-progress' ? '#3b82f6' : '#dbeafe',
+                  color: statusFilter === 'in-progress' ? 'white' : '#1e40af',
+                  border: 'none',
+                  padding: '0.25rem 0.5rem',
+                  borderRadius: '12px',
+                  cursor: 'pointer',
+                  fontWeight: '500'
+                }}
+              >
+                In Progress
+              </button>
+              <button
+                onClick={() => setStatusFilter('all')}
+                style={{
+                  background: statusFilter === 'all' ? '#6b7280' : '#f3f4f6',
+                  color: statusFilter === 'all' ? 'white' : '#374151',
+                  border: 'none',
+                  padding: '0.25rem 0.5rem',
+                  borderRadius: '12px',
+                  cursor: 'pointer',
+                  fontWeight: '500'
+                }}
+              >
+                Show All
+              </button>
+            </div>
+          </div>
           
           {filteredIssues.length === 0 ? (
             <div style={{ textAlign: 'center', padding: '3rem', color: '#64748b' }}>
               <h4>No issues found</h4>
-              <p>
-                {issues.length === 0 
-                  ? "You haven't reported any issues yet. Start making a difference in your community!"
-                  : "No issues match your current filters. Try adjusting the filters above."
-                }
-              </p>
-              {issues.length === 0 && (
-                <a href="/report" className="btn btn-primary" style={{ marginTop: '1rem' }}>
-                  Report Your First Issue
-                </a>
-              )}
+              <p>No issues match your current filters. Try adjusting the filters above.</p>
             </div>
           ) : (
             <>
               {/* Map View */}
               {view === 'map' && (
                 <div>
-                  <div style={{ marginBottom: '1rem', padding: '0.75rem', background: '#f0f9ff', borderRadius: '8px', fontSize: '0.875rem', color: '#0369a1' }}>
-                    💡 <strong>Tip:</strong> Click on any marker to see issue details. Different colors represent different statuses:
+                  <div style={{ marginBottom: '1rem', padding: '0.75rem', background: '#f0f4ff', borderRadius: '8px', fontSize: '0.875rem', color: '#4338ca' }}>
+                    🗺️ <strong>Admin Map View:</strong> Click markers to see details. Use status buttons above for quick filtering.
                     <span style={{ color: '#dc2626', fontWeight: 'bold' }}> Red = Pending</span>,
                     <span style={{ color: '#2563eb', fontWeight: 'bold' }}> Blue = In Progress</span>,
                     <span style={{ color: '#16a34a', fontWeight: 'bold' }}> Green = Resolved</span>
@@ -193,7 +255,11 @@ const SimpleDashboard: React.FC = () => {
 
               {/* List View */}
               {view === 'list' && (
-                <IssueList issues={filteredIssues} isAdminView={false} />
+                <IssueList 
+                  issues={filteredIssues} 
+                  isAdminView={true}
+                  onStatusUpdate={handleStatusUpdate}
+                />
               )}
             </>
           )}
@@ -203,4 +269,4 @@ const SimpleDashboard: React.FC = () => {
   );
 };
 
-export default SimpleDashboard;
+export default AdminDashboard;

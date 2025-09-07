@@ -1,6 +1,6 @@
 import React, { createContext, useContext, useEffect, useState } from 'react';
-import { AuthError } from '@supabase/supabase-js';
 import type { User, Session } from '@supabase/supabase-js';
+import { AuthError } from '@supabase/supabase-js';
 import { supabase } from '../services/supabase';
 
 interface AuthContextType {
@@ -78,15 +78,31 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     supabase.auth.getSession().then(({ data: { session } }) => {
       setSession(session);
       setCurrentUser(session?.user ?? null);
+      
+      // TEMPORARY: Set admin based on email (for testing)
+      if (session?.user?.email === 'gunagye.jain@gmail.com') {
+        setIsAdmin(true);
+      } else {
+        setIsAdmin(false);
+      }
+      
       setLoading(false);
     });
 
-    // Listen for auth changes - Fixed TypeScript error here
+    // Listen for auth changes
     const {
       data: { subscription },
     } = supabase.auth.onAuthStateChange(async (event, session: Session | null) => {
       setSession(session);
       setCurrentUser(session?.user ?? null);
+      
+      // TEMPORARY: Set admin based on email (for testing)
+      if (session?.user?.email === 'gunagye.jain@gmail.com') {
+        setIsAdmin(true);
+      } else {
+        setIsAdmin(false);
+      }
+      
       setLoading(false);
     });
 
