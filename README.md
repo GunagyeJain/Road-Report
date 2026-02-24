@@ -1,4 +1,4 @@
-# 🏘️ RoadReport - Digital Civic Issue Reporting Platform
+# 🏘️ Road Report - Digital Civic Issue Reporting Platform
 
 > **A modern, transparent platform for citizens to report civic issues and track their resolution in real-time.**
 
@@ -7,7 +7,7 @@
 
 ## 🌟 Overview
 
-CivicReport bridges the gap between citizens and local government by providing a transparent, real-time platform for reporting and tracking civic issues. Citizens can report problems like potholes, garbage accumulation, or broken streetlights with photos and GPS location, while administrators can manage and update issue status for complete transparency.
+Road Report bridges the gap between citizens and local government by providing a transparent, real-time platform for reporting and tracking civic issues. Citizens can report problems like potholes, garbage accumulation, or broken streetlights with photos and GPS location, while administrators can manage and update issue status for complete transparency.
 
 ### 🎯 **Key Features**
 - 📱 **Mobile-First Issue Reporting** - Photo capture with GPS location
